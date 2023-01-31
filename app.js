@@ -48,16 +48,14 @@ const item1=new Item({
   
   const defultItems=[item1,item2,item3];
 
- const listSchema={
-     name:String,
-     items:[itemsSchema]
- };
-
+  
+  const listSchema={
+      name:String,
+      items:[itemsSchema]
+  };
   const List=mongoose.model("List",listSchema);
-
-
+  
 module.exports = new Database()
-
 
 
 
@@ -86,6 +84,25 @@ app.get("/", function(req, res) {
 
 app.get("/:customListName",function(req,res){
   const customListName=req.params.customListName.customListName;
+
+List.findOne({name:customListName},function(err,foundList){
+  if(!err){
+    if(!foundList){
+      //create a new list
+      
+  const list=new List({
+    name:customListName,
+    items:defultItems
+  });
+  list.save();
+    }
+   
+  }else{
+    //show existing list
+    res.render("list", {listTitle:foundList.name, newListItems: foundItems.items});
+  }
+});
+
   const list=new List({
     name:customListName,
     items:defultItems
@@ -117,9 +134,9 @@ Item.findByIdAndRemove(checkedItemId,function(err){
 });
 
 
-app.get("/work", function(req,res){
-  res.render("list", {listTitle: "Work List", newListItems: workItems});
-});
+
+
+
 
 app.get("/about", function(req, res){
   res.render("about");
